@@ -1,0 +1,6 @@
+SumoLogic:
+ SUMO_ENDPOINT: <SUMO LOGIC HTTP URL>
+
+GsuiteAlertCenter:
+ DELEGATED_EMAIL: "<email>"
+ CREDENTIALS_FILEPATH: "<path to json crendential file>"

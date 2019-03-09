@@ -1,2 +1,6 @@
 # sumologic-gsuitealertcenter
-Collection for G Suite Alert Center
+Solution to pull alerts from G Suite Alert Center to Sumo Logic
+
+
+## Installation
+
