@@ -4,10 +4,8 @@ import json
 from datetime import datetime
 from logger import get_logger
 
-
 def get_current_timestamp():
-
-    return int(time.time())
+    return time.time()
 
 
 def convert_epoch_to_utc_date(timestamp, date_format="%Y-%m-%d %H:%M:%S"):
@@ -23,7 +21,7 @@ def convert_epoch_to_utc_date(timestamp, date_format="%Y-%m-%d %H:%M:%S"):
 def convert_utc_date_to_epoch(datestr, date_format='%Y-%m-%dT%H:%M:%S.%fZ'):
     epoch = datetime(1970, 1, 1)
     timestamp = (datetime.strptime(datestr, date_format) - epoch).total_seconds()
-    return int(timestamp)
+    return timestamp
 
 def get_body(data):
     if isinstance(data, list):

@@ -5,7 +5,6 @@ import time
 from concurrent import futures
 from logger import get_logger
 from factory import ProviderFactory, OutputHandlerFactory
-from client import SessionPool, ClientMixin
 from utils import get_current_timestamp, convert_epoch_to_utc_date, convert_utc_date_to_epoch
 from config import Config
 from oauth2client.service_account import ServiceAccountCredentials
@@ -23,6 +22,8 @@ class NetskopeCollector(object):
         self.kvstore = op_cli.get_storage("keyvalue", name='gsuitealertcenter.db')
         self.DEFAULT_START_TIME_EPOCH = get_current_timestamp() - self.collection_config['BACKFILL_DAYS']*24*60*60
         self.alertcli = self.get_alert_client()
+        self.DATE_FORMAT='%Y-%m-%dT%H:%M:%S.%fZ'
+        self.MOVING_WINDOW_DELTA=0.001
 
     def get_alert_client(self):
         SCOPES = self.config['GsuiteAlertCenter']['SCOPES']
@@ -49,11 +50,10 @@ class NetskopeCollector(object):
         return obj
 
     def build_params(self, alert_type, start_time_epoch, end_time_epoch, pageToken, page_size):
-        date_format = '%Y-%m-%dT%H:%M:%SZ'
         params = {
             'pageSize': page_size,
             'pageToken': pageToken,
-            'filter': f'''create_time >= \"{convert_epoch_to_utc_date(start_time_epoch, date_format)}\" AND create_time <= \"{convert_epoch_to_utc_date(end_time_epoch, date_format)}\" AND type = \"{alert_type}\"''',
+            'filter': f'''create_time >= \"{convert_epoch_to_utc_date(start_time_epoch, self.DATE_FORMAT)}\" AND create_time <= \"{convert_epoch_to_utc_date(end_time_epoch, self.DATE_FORMAT)}\" AND type = \"{alert_type}\"''',
             'orderBy': "create_time desc"
         }
         return params
@@ -62,8 +62,8 @@ class NetskopeCollector(object):
         end_time_epoch = get_current_timestamp() - self.collection_config['END_TIME_EPOCH_OFFSET_SECONDS']
         params = self.build_params(alert_type, start_time_epoch, end_time_epoch, None, 1)
         response = self.alertcli.alerts().list(**params).execute()
-        start_date = convert_epoch_to_utc_date(start_time_epoch)
-        end_date = convert_epoch_to_utc_date(end_time_epoch)
+        start_date = convert_epoch_to_utc_date(start_time_epoch, self.DATE_FORMAT)
+        end_date = convert_epoch_to_utc_date(end_time_epoch, self.DATE_FORMAT)
         if response.get("alerts") and len(response["alerts"]) > 0:
             new_end_date = response["alerts"][0]["createTime"]
             new_end_time_epoch = convert_utc_date_to_epoch(new_end_date)
@@ -102,12 +102,12 @@ class NetskopeCollector(object):
                     # Todo save data and separate out fetching and sending pipelines
                     params['pageToken'] = response.get('next_page_token') if send_success else params['pageToken']
                     has_next_page = True if params['pageToken'] else False
-                    self.log.info(f'''Finished Fetching Page: {count} Event Type: {alert_type} Datalen: {len(data)} starttime: {convert_epoch_to_utc_date(start_time_epoch)} endtime: {convert_epoch_to_utc_date(end_time_epoch)}''')
+                    self.log.info(f'''Finished Fetching Page: {count} Event Type: {alert_type} Datalen: {len(data)} starttime: {convert_epoch_to_utc_date(start_time_epoch, self.DATE_FORMAT)} endtime: {convert_epoch_to_utc_date(end_time_epoch, self.DATE_FORMAT)}''')
                 is_data_ingested  = fetch_success and send_success
                 next_request = is_data_ingested and has_next_page
                 if is_data_ingested and not has_next_page:
-                    self.log.info(f'''Moving starttime window for {alert_type} to {convert_epoch_to_utc_date(end_time_epoch + 1)}''')
-                    self.set_fetch_state(alert_type, end_time_epoch + 1, None)
+                    self.log.info(f'''Moving starttime window for {alert_type} to {convert_epoch_to_utc_date(end_time_epoch + self.MOVING_WINDOW_DELTA, self.DATE_FORMAT)}''')
+                    self.set_fetch_state(alert_type, end_time_epoch + self.MOVING_WINDOW_DELTA, None)
                 if not is_data_ingested:  # saving skip in case of failures for restarting in future
                     self.set_fetch_state(alert_type, start_time_epoch, end_time_epoch, params["pageToken"])
         finally:

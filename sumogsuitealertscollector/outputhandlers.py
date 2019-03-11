@@ -90,9 +90,9 @@ class STDOUTHandler(BaseOutputHandler):
 
 class FileHandler(BaseOutputHandler):
 
-    def setUp(self, config, path, *args, **kwargs):
-        self.filepath = path
-        self.fp = open(self.filepath, "a")
+    def setUp(self, config, path=None, *args, **kwargs):
+        self.filepath = path or "alerts.log"
+        self.fp = open(self.filepath, "ab")
 
     def send(self, data):
         if not data:
