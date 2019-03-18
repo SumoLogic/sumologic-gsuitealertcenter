@@ -2,19 +2,30 @@
 import traceback
 import sys
 import time
+import os
+import datetime
 from concurrent import futures
-from logger import get_logger
-from factory import ProviderFactory, OutputHandlerFactory
-from utils import get_current_timestamp, convert_epoch_to_utc_date, convert_utc_date_to_epoch
-from config import Config
+from common.logger import get_logger
+from omnistorage.factory import ProviderFactory
+from sumoclient.factory import OutputHandlerFactory
+from sumoclient.utils import get_current_timestamp, convert_epoch_to_utc_date, convert_utc_date_to_epoch
+from common.config import Config
 from oauth2client.service_account import ServiceAccountCredentials
 from googleapiclient.discovery import build
 
-class NetskopeCollector(object):
+class GSuiteAlertsCollector(object):
+
+    CONFIG_FILENAME = "gsuitealertcenter.yaml"
+    STOP_TIME_OFFSET_SECONDS = 10
+    DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
+    MOVING_WINDOW_DELTA = 0.001
+    FUNCTION_TIMEOUT = 5*60
 
     def __init__(self):
+        self.start_time = datetime.datetime.utcnow()
         cfgpath = sys.argv[1] if len(sys.argv) > 1 else ''
-        self.config = Config().get_config(cfgpath)
+        self.root_dir = self.get_current_dir()
+        self.config = Config().get_config(self.CONFIG_FILENAME, self.root_dir, cfgpath)
         self.log = get_logger(__name__, force_create=True, **self.config['Logging'])
         self.collection_config = self.config['Collection']
         self.api_config = self.config['GsuiteAlertCenter']
@@ -22,8 +33,10 @@ class NetskopeCollector(object):
         self.kvstore = op_cli.get_storage("keyvalue", name='gsuitealertcenter.db')
         self.DEFAULT_START_TIME_EPOCH = get_current_timestamp() - self.collection_config['BACKFILL_DAYS']*24*60*60
         self.alertcli = self.get_alert_client()
-        self.DATE_FORMAT='%Y-%m-%dT%H:%M:%S.%fZ'
-        self.MOVING_WINDOW_DELTA=0.001
+
+    def get_current_dir(self):
+        cur_dir = os.path.dirname(__file__)
+        return cur_dir
 
     def get_alert_client(self):
         SCOPES = self.config['GsuiteAlertCenter']['SCOPES']
@@ -77,14 +90,21 @@ class NetskopeCollector(object):
     def transform_data(self, data):
         # import random
         # srcip = ["216.161.180.148", "54.203.63.36"]
-        # for d in data:
-        #     d["timestamp"] = int(time.time())
-        #     d["srcip"] = random.choice(srcip)
+        for d in data:
+            d["createTime"] = convert_epoch_to_utc_date(int(time.time()), self.DATE_FORMAT)
         return data
+
+
+    def is_time_remaining(self):
+        now = datetime.datetime.utcnow()
+        time_passed =  (now - self.start_time).total_seconds()
+        self.log.info("checking time_passed: %s" % time_passed)
+        return time_passed + self.STOP_TIME_OFFSET_SECONDS < self.FUNCTION_TIMEOUT
+
 
     def fetch(self, alert_type, start_time_epoch, end_time_epoch, pageToken):
         params = self.build_params(alert_type, start_time_epoch, end_time_epoch, pageToken, self.api_config['PAGINATION_LIMIT'])
-        output_handler = OutputHandlerFactory.get_handler(self.config['Collection']['OUTPUT_HANDLER'], config=self.config)
+        output_handler = OutputHandlerFactory.get_handler(self.config['Collection']['OUTPUT_HANDLER'], path="%s.json" % alert_type, config=self.config)
         next_request = True
         send_success = has_next_page = False
         count = 0
@@ -104,12 +124,15 @@ class NetskopeCollector(object):
                     has_next_page = True if params['pageToken'] else False
                     self.log.info(f'''Finished Fetching Page: {count} Event Type: {alert_type} Datalen: {len(data)} starttime: {convert_epoch_to_utc_date(start_time_epoch, self.DATE_FORMAT)} endtime: {convert_epoch_to_utc_date(end_time_epoch, self.DATE_FORMAT)}''')
                 is_data_ingested  = fetch_success and send_success
-                next_request = is_data_ingested and has_next_page
-                if is_data_ingested and not has_next_page:
+                next_request = is_data_ingested and has_next_page and self.is_time_remaining()
+
+                if not (is_data_ingested or self.is_time_remaining()):  # saving in case of failures or function timeout
+                    self.set_fetch_state(alert_type, start_time_epoch, end_time_epoch, params["pageToken"])
+                elif not has_next_page:
                     self.log.info(f'''Moving starttime window for {alert_type} to {convert_epoch_to_utc_date(end_time_epoch + self.MOVING_WINDOW_DELTA, self.DATE_FORMAT)}''')
                     self.set_fetch_state(alert_type, end_time_epoch + self.MOVING_WINDOW_DELTA, None)
-                if not is_data_ingested:  # saving skip in case of failures for restarting in future
-                    self.set_fetch_state(alert_type, start_time_epoch, end_time_epoch, params["pageToken"])
+
+
         finally:
             output_handler.close()
         self.log.info(f''' Total Pages fetched {count} for Event Type: {alert_type}''')
@@ -160,7 +183,7 @@ class NetskopeCollector(object):
 
 def main():
     try:
-        ns = NetskopeCollector()
+        ns = GSuiteAlertsCollector()
         ns.run()
         # ns.test()
     except BaseException as e:
@@ -169,4 +192,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

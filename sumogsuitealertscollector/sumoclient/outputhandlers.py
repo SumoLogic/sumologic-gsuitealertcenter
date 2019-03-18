@@ -1,11 +1,10 @@
 # -*- coding: future_fstrings -*-
-import json
 import sys
 import math
 import zlib
-from base import BaseOutputHandler
-from client import SessionPool, ClientMixin
-from utils import get_body
+from sumoclient.base import BaseOutputHandler
+from sumoclient.httputils import SessionPool, ClientMixin
+from sumoclient.utils import get_body
 
 
 class HTTPHandler(BaseOutputHandler):

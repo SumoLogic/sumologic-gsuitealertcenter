@@ -1,5 +1,4 @@
 from abc import ABCMeta, abstractmethod
-from utils import get_logger
 import six
 
 @six.add_metaclass(ABCMeta)
@@ -61,17 +60,3 @@ class KeyValueStorage():
     def destroy(self):
         pass
 
-@six.add_metaclass(ABCMeta)
-class BaseOutputHandler():
-
-    def __init__(self, *args, **kwargs):
-        self.log = get_logger(__name__)
-        self.setUp(*args, **kwargs)
-
-    @abstractmethod
-    def setUp(self, *args, **kwargs):
-        pass
-
-    @abstractmethod
-    def send(self, data):
-        pass

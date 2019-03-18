@@ -2,8 +2,8 @@
 import shelve
 import threading
 import os
-from utils import get_logger
-from base import Provider, KeyValueStorage
+from sumoclient.utils import get_logger
+from omnistorage.base import Provider, KeyValueStorage
 import datetime
 
 

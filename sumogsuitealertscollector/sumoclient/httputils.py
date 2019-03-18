@@ -4,7 +4,7 @@ from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 from datetime import datetime
 import threading
-from utils import get_logger
+from sumoclient.utils import get_logger
 
 
 try:

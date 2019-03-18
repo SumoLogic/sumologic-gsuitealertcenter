@@ -2,7 +2,7 @@
 import time
 import json
 from datetime import datetime
-from logger import get_logger
+from common.logger import get_logger
 
 def get_current_timestamp():
     return time.time()
