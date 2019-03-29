@@ -2,7 +2,7 @@ from google.cloud import datastore
 from omnistorage.base import KeyValueStorage, Provider
 from omnistorage.factory import ProviderFactory
 from common.logger import get_logger
-from errors import ItemNotFound
+from omnistorage.errors import ItemNotFound
 
 
 class GCPKVStorage(KeyValueStorage):

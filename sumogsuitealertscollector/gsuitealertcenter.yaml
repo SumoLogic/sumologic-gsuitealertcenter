@@ -21,23 +21,22 @@ GsuiteAlertCenter:
     - "Government attack warning"
     - "Device compromised"
     - "Suspicious activity"
- DELEGATED_EMAIL: "admin@alertcenter1.bigr.name"
- CREDENTIALS_FILEPATH: "/Users/hpal/git/sumologic-gsuitealertcenter/alertcreds.json"
+ DELEGATED_EMAIL: null
+ CREDENTIALS_FILEPATH: null
  VERSION: "v1beta1"
  FETCH_METHOD: get
  PAGINATION_LIMIT: 100
-
 
 Logging:
  LOG_FORMAT: "%(levelname)s | %(asctime)s | %(threadName)s | %(name)s | %(message)s"
  ROTATION_TYPE: D
  ROTATION_INTERVAL: 10
  ENABLE_CONSOLE_LOG: true
- ENABLE_LOGFILE: true
+ ENABLE_LOGFILE: false
  LOG_FILEPATH: /tmp/sumoapiclient.log
 
 Collection:
- ENVIRONMENT: onprem
+ ENVIRONMENT: gcp
  NUM_WORKERS: 8
  OUTPUT_HANDLER: HTTP
  MAX_RETRY: 5
@@ -47,6 +46,7 @@ Collection:
  MAX_PAYLOAD_BYTESIZE: 500000
  END_TIME_EPOCH_OFFSET_SECONDS: 120
  BACKFILL_DAYS: 1000
+ DBNAME: "gsuitealertcenter"
 
 SumoLogic:
- SUMO_ENDPOINT: "<SUMO HTTP SOURCE ENDPOINT>"
+ SUMO_ENDPOINT: null

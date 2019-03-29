@@ -7,7 +7,7 @@ class ProviderFactory(DynamicLoadMixin):
     provider_map = {
         # "aws": AWSProvider,
         # "azure": AzureProvider,
-        # "gcp": GCPProvider,
+        "gcp": "gcp.GCPProvider",
         "onprem": "onprem.OnPremProvider"
     }
 

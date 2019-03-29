@@ -30,7 +30,7 @@ class GSuiteAlertsCollector(object):
         self.collection_config = self.config['Collection']
         self.api_config = self.config['GsuiteAlertCenter']
         op_cli = ProviderFactory.get_provider(self.config['Collection']['ENVIRONMENT'])
-        self.kvstore = op_cli.get_storage("keyvalue", name='gsuitealertcenter.db')
+        self.kvstore = op_cli.get_storage("keyvalue", name=self.config['Collection']['DBNAME'])
         self.DEFAULT_START_TIME_EPOCH = get_current_timestamp() - self.collection_config['BACKFILL_DAYS']*24*60*60
         self.alertcli = self.get_alert_client()
 
