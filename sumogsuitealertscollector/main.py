@@ -12,6 +12,8 @@ from sumoclient.utils import get_current_timestamp, convert_epoch_to_utc_date, c
 from common.config import Config
 from oauth2client.service_account import ServiceAccountCredentials
 from googleapiclient.discovery import build
+from google.auth import default
+
 
 class GSuiteAlertsCollector(object):
 
@@ -40,11 +42,15 @@ class GSuiteAlertsCollector(object):
 
     def get_alert_client(self):
         SCOPES = self.config['GsuiteAlertCenter']['SCOPES']
-        CREDS_FILEPATH = self.config['GsuiteAlertCenter']['CREDENTIALS_FILEPATH']
         API_VERSION = self.config['GsuiteAlertCenter']['VERSION']
         DELEGATED_EMAIL = self.config['GsuiteAlertCenter']['DELEGATED_EMAIL']
-
-        credentials = ServiceAccountCredentials.from_json_keyfile_name(CREDS_FILEPATH)
+        if 'CREDENTIALS_FILEPATH' in self.config['GsuiteAlertCenter']:
+            CREDS_FILEPATH = self.config['GsuiteAlertCenter']['CREDENTIALS_FILEPATH']
+            credentials = ServiceAccountCredentials.from_json_keyfile_name(CREDS_FILEPATH)
+        else:
+            # if default creds path is set or when run as google cloud functions
+            creds, _ = default()
+            credentials = ServiceAccountCredentials(creds.service_account_email, creds.signer)
         delegated_credentials = credentials.create_delegated(DELEGATED_EMAIL).create_scoped(SCOPES)
         alertcli = build('alertcenter', API_VERSION, credentials=delegated_credentials)
         return alertcli

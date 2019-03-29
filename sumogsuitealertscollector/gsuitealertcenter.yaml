@@ -22,7 +22,6 @@ GsuiteAlertCenter:
     - "Device compromised"
     - "Suspicious activity"
  DELEGATED_EMAIL: null
- CREDENTIALS_FILEPATH: null
  VERSION: "v1beta1"
  FETCH_METHOD: get
  PAGINATION_LIMIT: 100
