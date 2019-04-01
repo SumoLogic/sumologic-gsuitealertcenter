@@ -1,0 +1,52 @@
+GsuiteAlertCenter:
+ SCOPES:
+    - 'https://www.googleapis.com/auth/apps.alerts'
+ ALERT_TYPES:
+    - "Customer takeout initiated"
+    - "Misconfigured whitelist "
+    - "User reported phishing"
+    - "User reported spam spike"
+    - "Suspicious message reported"
+    - "Phishing reclassification"
+    - "Malware reclassification"
+    - "Leaked password"
+    - "Suspicious login"
+    - "Suspicious login (less secure app)"
+    - "Suspicious programmatic login"
+    - "User suspended"
+    - "User suspended (spam)"
+    - "User suspended (spam through relay)"
+    - "User suspended (suspicious activity)"
+    - "Google Operations"
+    - "Government attack warning"
+    - "Device compromised"
+    - "Suspicious activity"
+ DELEGATED_EMAIL: null
+ VERSION: "v1beta1"
+ FETCH_METHOD: get
+ PAGINATION_LIMIT: 100
+ CREDENTIALS_FILEPATH: null
+
+Logging:
+ LOG_FORMAT: "%(levelname)s | %(asctime)s | %(threadName)s | %(name)s | %(message)s"
+ ROTATION_TYPE: D
+ ROTATION_INTERVAL: 10
+ ENABLE_CONSOLE_LOG: true
+ ENABLE_LOGFILE: false
+ LOG_FILEPATH: /tmp/sumoapiclient.log
+
+Collection:
+ ENVIRONMENT: gcp
+ NUM_WORKERS: 2
+ OUTPUT_HANDLER: HTTP
+ MAX_RETRY: 5
+ BACKOFF_FACTOR: 1
+ TIMEOUT: 60
+ COMPRESSED: true
+ MAX_PAYLOAD_BYTESIZE: 500000
+ END_TIME_EPOCH_OFFSET_SECONDS: 120
+ BACKFILL_DAYS: 1
+ DBNAME: "gsuitealertcenter"
+
+SumoLogic:
+ SUMO_ENDPOINT: null
