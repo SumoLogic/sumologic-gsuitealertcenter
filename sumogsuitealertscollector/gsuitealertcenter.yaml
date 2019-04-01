@@ -25,6 +25,7 @@ GsuiteAlertCenter:
  VERSION: "v1beta1"
  FETCH_METHOD: get
  PAGINATION_LIMIT: 100
+ CREDENTIALS_FILEPATH: null
 
 Logging:
  LOG_FORMAT: "%(levelname)s | %(asctime)s | %(threadName)s | %(name)s | %(message)s"
@@ -36,7 +37,7 @@ Logging:
 
 Collection:
  ENVIRONMENT: gcp
- NUM_WORKERS: 8
+ NUM_WORKERS: 2
  OUTPUT_HANDLER: HTTP
  MAX_RETRY: 5
  BACKOFF_FACTOR: 1
@@ -44,7 +45,7 @@ Collection:
  COMPRESSED: true
  MAX_PAYLOAD_BYTESIZE: 500000
  END_TIME_EPOCH_OFFSET_SECONDS: 120
- BACKFILL_DAYS: 1000
+ BACKFILL_DAYS: 1
  DBNAME: "gsuitealertcenter"
 
 SumoLogic:

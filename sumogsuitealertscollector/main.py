@@ -12,7 +12,6 @@ from sumoclient.utils import get_current_timestamp, convert_epoch_to_utc_date, c
 from common.config import Config
 from oauth2client.service_account import ServiceAccountCredentials
 from googleapiclient.discovery import build
-from google.auth import default
 
 
 class GSuiteAlertsCollector(object):
@@ -40,19 +39,18 @@ class GSuiteAlertsCollector(object):
         cur_dir = os.path.dirname(__file__)
         return cur_dir
 
-    def get_alert_client(self):
+    def get_credentials(self):
         SCOPES = self.config['GsuiteAlertCenter']['SCOPES']
-        API_VERSION = self.config['GsuiteAlertCenter']['VERSION']
         DELEGATED_EMAIL = self.config['GsuiteAlertCenter']['DELEGATED_EMAIL']
-        if 'CREDENTIALS_FILEPATH' in self.config['GsuiteAlertCenter']:
-            CREDS_FILEPATH = self.config['GsuiteAlertCenter']['CREDENTIALS_FILEPATH']
-            credentials = ServiceAccountCredentials.from_json_keyfile_name(CREDS_FILEPATH)
-        else:
-            # if default creds path is set or when run as google cloud functions
-            creds, _ = default()
-            credentials = ServiceAccountCredentials(creds.service_account_email, creds.signer)
+        CREDENTIALS_FILEPATH = self.config['GsuiteAlertCenter']['CREDENTIALS_FILEPATH']
+        credentials = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILEPATH)
         delegated_credentials = credentials.create_delegated(DELEGATED_EMAIL).create_scoped(SCOPES)
-        alertcli = build('alertcenter', API_VERSION, credentials=delegated_credentials)
+        return delegated_credentials
+
+    def get_alert_client(self):
+        API_VERSION = self.config['GsuiteAlertCenter']['VERSION']
+        credentials = self.get_credentials()
+        alertcli = build('alertcenter', API_VERSION, credentials=credentials, cache_discovery=False)
         return alertcli
 
     def set_fetch_state(self, alert_type, start_time_epoch, end_time_epoch, pageToken=None):
@@ -187,7 +185,7 @@ class GSuiteAlertsCollector(object):
         self.fetch(**params)
 
 
-def main():
+def main(context=None):
     try:
         ns = GSuiteAlertsCollector()
         ns.run()
