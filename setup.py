@@ -17,7 +17,7 @@ with io.open(join(here, 'README.md'), encoding='utf-8') as f:
 
 
 CONSOLE_SCRIPTS = [
-    'sumogsuitealertscollector=sumogsuitealertscollector.gsuitealertcenter:main'
+    'sumogsuitealertscollector=sumogsuitealertscollector.main:main'
 ]
 
 setup(
