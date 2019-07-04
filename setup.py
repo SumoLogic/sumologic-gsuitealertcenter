@@ -25,6 +25,10 @@ setup(
     version=__versionstr__,
     packages=find_packages(),
     install_requires=INSTALL_REQUIRES,
+    extras_require={
+        ':python_version < "3.2"': ['futures'],
+        ':python_version < "3.6"': ['future-fstrings']
+    },
     # PyPI metadata
     author="SumoLogic",
     author_email="it@sumologic.com",

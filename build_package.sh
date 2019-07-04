@@ -9,6 +9,6 @@ rm sumogsuitealertscollector/omnistorage/*.db sumogsuitealertscollector/omnistor
 rm sumogsuitealertscollector.zip
 
 python setup.py sdist bdist_wheel
-#python -m twine upload dist/*
+python -m twine upload dist/* --repository testpypi
 
-
+# pip install --extra-index-url https://testpypi.python.org/pypi sumologic-gsuitealertcenter --no-cache-dir
