@@ -75,7 +75,7 @@ class Config(object):
         config = {}
         with open(filepath, 'r') as stream:
             try:
-                config = yaml.load(stream)
+                config = yaml.load(stream, Loader=yaml.FullLoader)
             except yaml.YAMLError as exc:
                 log.error(f"Unable to read config {filepath} Error: {exc}")
         return config
