@@ -35,7 +35,7 @@ deploy_functions() {
     rm -r sumogsuitealertscollector/
 
     echo "downloading zip..."
-    wget https://s3.amazonaws.com/appdev-cloudformation-templates/sumogsuitealertscollector.zip && unzip sumogsuitealertscollector.zip -d sumogsuitealertscollector/
+    wget https://s3.amazonaws.com/appdev-cloudformation-templates/sumogsuitealertscollector.zip && unzip sumogsuitealertscollector.zip
 
     # creating access keys and downloading
     filename="service_account_credentials.json"

@@ -20,6 +20,11 @@ CONSOLE_SCRIPTS = [
     'sumogsuitealertscollector=sumogsuitealertscollector.main:main'
 ]
 
+INSTALL_REQUIRES.extend([
+    'futures;python_version<"3.2"',
+    'future-fstrings;python_version<"3.6"'
+])
+
 setup(
     name="sumologic-gsuitealertcenter",
     version=__versionstr__,
@@ -27,7 +32,7 @@ setup(
     install_requires=INSTALL_REQUIRES,
     # PyPI metadata
     author="SumoLogic",
-    author_email="it@sumologic.com",
+    author_email="it@sumologic.com, apps-team@sumologic.com",
     description="Sumo Logic collection solution for G Suite Alert Center",
     license="PSF",
     long_description=long_description,

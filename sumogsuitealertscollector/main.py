@@ -92,19 +92,15 @@ class GSuiteAlertsCollector(object):
             return None
 
     def transform_data(self, data):
-        # import random
-        # srcip = ["216.161.180.148", "54.203.63.36"]
-        for d in data:
-            d["createTime"] = convert_epoch_to_utc_date(int(time.time()), self.DATE_FORMAT)
+        # for d in data:
+            # print(d)
         return data
-
 
     def is_time_remaining(self):
         now = datetime.datetime.utcnow()
         time_passed =  (now - self.start_time).total_seconds()
         self.log.info("checking time_passed: %s" % time_passed)
         return time_passed + self.STOP_TIME_OFFSET_SECONDS < self.FUNCTION_TIMEOUT
-
 
     def fetch(self, alert_type, start_time_epoch, end_time_epoch, pageToken):
         params = self.build_params(alert_type, start_time_epoch, end_time_epoch, pageToken, self.api_config['PAGINATION_LIMIT'])
@@ -127,7 +123,7 @@ class GSuiteAlertsCollector(object):
                     params['pageToken'] = response.get('next_page_token') if send_success else params['pageToken']
                     has_next_page = True if params['pageToken'] else False
                     self.log.info(f'''Finished Fetching Page: {count} Event Type: {alert_type} Datalen: {len(data)} starttime: {convert_epoch_to_utc_date(start_time_epoch, self.DATE_FORMAT)} endtime: {convert_epoch_to_utc_date(end_time_epoch, self.DATE_FORMAT)}''')
-                is_data_ingested  = fetch_success and send_success
+                is_data_ingested = fetch_success and send_success
                 next_request = is_data_ingested and has_next_page and self.is_time_remaining()
 
                 if not (is_data_ingested or self.is_time_remaining()):  # saving in case of failures or function timeout
@@ -135,7 +131,6 @@ class GSuiteAlertsCollector(object):
                 elif not has_next_page:
                     self.log.info(f'''Moving starttime window for {alert_type} to {convert_epoch_to_utc_date(end_time_epoch + self.MOVING_WINDOW_DELTA, self.DATE_FORMAT)}''')
                     self.set_fetch_state(alert_type, end_time_epoch + self.MOVING_WINDOW_DELTA, None)
-
 
         finally:
             output_handler.close()
