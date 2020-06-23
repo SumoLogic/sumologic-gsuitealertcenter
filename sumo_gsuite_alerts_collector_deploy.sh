@@ -26,6 +26,7 @@ create_service_account() {
 
     echo "assigning datastore owner role..."
     gcloud projects add-iam-policy-binding "$project_id" --member="serviceAccount:$service_account_email" --role="roles/datastore.owner"
+    gcloud projects add-iam-policy-binding "$project_id" --member="serviceAccount:$service_account_email" --role="roles/cloudfunctions.invoker"
 }
 
 deploy_functions() {
@@ -54,12 +55,13 @@ create_job() {
 
     uri="https://$region-$project_id.cloudfunctions.net/$funcname"
     cron_frequency="*/5 * * * *"
+    service_account_email="$service_account@$project_id.iam.gserviceaccount.com"
 
     # Cloud Scheduler is currently available in all App Engine supported regions. To use Cloud Scheduler your project must contain an App Engine app that is located in one of the supported regions.
     # for more option refer - https://cloud.google.com/sdk/gcloud/reference/beta/scheduler/jobs/create/http
     echo "creating cloud scheduler with jobname: $job_name frequency: $cron_frequency with function uri: $uri"
     gcloud services enable cloudscheduler.googleapis.com
-    gcloud beta scheduler jobs create http "$job_name" --description="Job for triggering $funcname google cloud function" --uri="$uri" --schedule="$cron_frequency"
+    gcloud beta scheduler jobs create http "$job_name" --description="Job for triggering $funcname google cloud function" --uri="$uri" --schedule="$cron_frequency" --oidc-service-account-email="$service_account_email"
 
 }
 
