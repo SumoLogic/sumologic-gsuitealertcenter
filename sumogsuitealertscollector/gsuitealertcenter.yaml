@@ -21,6 +21,9 @@ GsuiteAlertCenter:
     - "Government attack warning"
     - "Device compromised"
     - "Suspicious activity"
+    - "Data Loss Prevention"
+    - "Activity Rule"
+    - "AppMaker Default Cloud SQL setup"
  DELEGATED_EMAIL: null
  VERSION: "v1beta1"
  FETCH_METHOD: get
