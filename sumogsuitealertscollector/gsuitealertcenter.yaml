@@ -39,7 +39,7 @@ Logging:
  LOG_FILEPATH: /tmp/sumoapiclient.log
 
 Collection:
- ENVIRONMENT: gcp
+ ENVIRONMENT: onprem
  NUM_WORKERS: 2
  OUTPUT_HANDLER: HTTP
  MAX_RETRY: 5
