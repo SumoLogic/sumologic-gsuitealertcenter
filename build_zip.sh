@@ -7,10 +7,8 @@ rm sumogsuitealertscollector/*.pyc sumogsuitealertscollector/sumoclient/*.pyc su
 rm sumogsuitealertscollector/omnistorage/*.db sumogsuitealertscollector/omnistorage/gsuitealertcenter
 rm sumogsuitealertscollector.zip
 cp requirements.txt sumogsuitealertscollector/
-cd sumogsuitealertscollector/
-zip -r ../sumogsuitealertscollector.zip .
-rm requirements.txt
-cd ..
+zip -r sumogsuitealertscollector.zip sumogsuitealertscollector
+rm sumogsuitealertscollector/requirements.txt
 
 aws s3 cp sumogsuitealertscollector.zip s3://appdev-cloudformation-templates/sumogsuitealertscollector.zip --acl public-read
-aws s3 cp deploy.sh s3://appdev-cloudformation-templates/sumo_gsuite_alerts_collector_deploy.sh --acl public-read
+aws s3 cp sumo_gsuite_alerts_collector_deploy.sh s3://appdev-cloudformation-templates/sumo_gsuite_alerts_collector_deploy.sh --acl public-read

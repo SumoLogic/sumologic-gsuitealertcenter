@@ -70,7 +70,7 @@ class GSuiteAlertsCollector(object):
         params = {
             'pageSize': page_size,
             'pageToken': pageToken,
-            'filter': f'''create_time >= \"{convert_epoch_to_utc_date(start_time_epoch, self.DATE_FORMAT)}\" AND create_time <= \"{convert_epoch_to_utc_date(end_time_epoch, self.DATE_FORMAT)}\" AND type = \"{alert_type}\"''',
+            'filter': f'''createTime >= \"{convert_epoch_to_utc_date(start_time_epoch, self.DATE_FORMAT)}\" AND createTime <= \"{convert_epoch_to_utc_date(end_time_epoch, self.DATE_FORMAT)}\" AND type = \"{alert_type}\"''',
             'orderBy': "create_time desc"
         }
         return params
