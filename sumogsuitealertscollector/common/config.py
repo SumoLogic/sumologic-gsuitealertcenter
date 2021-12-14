@@ -1,4 +1,3 @@
-# -*- coding: future_fstrings -*-
 import os
 from sumoclient.utils import get_logger
 import yaml

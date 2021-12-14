@@ -1,4 +1,3 @@
-# -*- coding: future_fstrings -*-
 import shelve
 import threading
 import os

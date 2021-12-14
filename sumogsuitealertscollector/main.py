@@ -1,4 +1,3 @@
-# -*- coding: future_fstrings -*-
 import traceback
 import sys
 import time
