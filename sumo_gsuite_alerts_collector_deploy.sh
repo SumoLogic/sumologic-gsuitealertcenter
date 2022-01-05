@@ -45,7 +45,7 @@ deploy_functions() {
     # for more options refer - https://cloud.google.com/sdk/gcloud/reference/beta/functions/deploy#--source
     echo "deploying and configuring environement variables"
     gcloud beta functions deploy "$funcname" --entry-point main --trigger-http --memory="$function_memory" --timeout="$function_timeout" --service-account="$service_account_email" \
-        --region="$region" --runtime=python37 --source=sumogsuitealertscollector/ --set-env-vars DELEGATED_EMAIL="$delegated_email",SUMO_ENDPOINT="$sumo_endpoint",CREDENTIALS_FILEPATH="$filename"
+        --region="$region" --runtime=python37 --source=sumogsuitealertscollector/ --set-env-vars DELEGATED_EMAIL="$delegated_email",ENVIRONMENT="gcp",SUMO_ENDPOINT="$sumo_endpoint",CREDENTIALS_FILEPATH="$filename"
 
     # updating env variables
     # gcloud functions deploy "$funcname" --update-env-vars DELEGATED_EMAIL=$delegated_email,SUMO_ENDPOINT=$sumo_endpoint,CREDENTIALS_FILEPATH=$credentials_path

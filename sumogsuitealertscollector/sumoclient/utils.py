@@ -1,4 +1,3 @@
-# -*- coding: future_fstrings -*-
 import time
 import json
 from datetime import datetime

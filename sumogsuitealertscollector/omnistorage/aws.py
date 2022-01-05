@@ -1,4 +1,3 @@
-# -*- coding: future_fstrings -*-
 from base import Provider, KeyValueStorage
 import boto3
 

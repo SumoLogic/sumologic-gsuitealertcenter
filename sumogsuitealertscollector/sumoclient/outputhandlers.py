@@ -1,4 +1,3 @@
-# -*- coding: future_fstrings -*-
 import sys
 import math
 import zlib
