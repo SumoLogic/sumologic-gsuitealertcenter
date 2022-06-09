@@ -14,14 +14,14 @@ function_timeout="300s"
 # job name should be unique in a project
 job_name="$funcname""-""$region""-job"
 service_account="sumogsuitealertcenteraccount"
-
+service_account_email="$service_account@$project_id.iam.gserviceaccount.com"
 
 create_service_account() {
 
     echo "creating service account..."
     gcloud iam service-accounts create $service_account --display-name "Sumo Gsuite Alert Center Collector"
 
-    service_account_email="$service_account@$project_id.iam.gserviceaccount.com"
+
     echo "service account email $service_account_email"
 
     echo "assigning datastore owner role..."
@@ -55,13 +55,13 @@ create_job() {
 
     uri="https://$region-$project_id.cloudfunctions.net/$funcname"
     cron_frequency="*/5 * * * *"
-    service_account_email="$service_account@$project_id.iam.gserviceaccount.com"
+
 
     # Cloud Scheduler is currently available in all App Engine supported regions. To use Cloud Scheduler your project must contain an App Engine app that is located in one of the supported regions.
     # for more option refer - https://cloud.google.com/sdk/gcloud/reference/beta/scheduler/jobs/create/http
     echo "creating cloud scheduler with jobname: $job_name frequency: $cron_frequency with function uri: $uri"
     gcloud services enable cloudscheduler.googleapis.com
-    gcloud beta scheduler jobs create http "$job_name" --description="Job for triggering $funcname google cloud function" --uri="$uri" --schedule="$cron_frequency" --oidc-service-account-email="$service_account_email"
+    gcloud beta scheduler jobs create http "$job_name" --description="Job for triggering $funcname google cloud function" --uri="$uri" --schedule="$cron_frequency" --oidc-service-account-email="$service_account_email" --location "$region"
 
 }
 
@@ -73,7 +73,7 @@ delete_job() {
 
 delete_service_account() {
 
-    service_account_email="$service_account@$project_id.iam.gserviceaccount.com"
+
     echo "Deleting $service_account_email"
     gcloud iam service-accounts delete $service_account_email
 }
@@ -94,6 +94,8 @@ create_resources() {
 
     echo "enabling alert center api..."
     gcloud services enable alertcenter.googleapis.com
+    echo "enabling cloud build api..."
+    gcloud services enable cloudbuild.googleapis.com
 
     # authorize gsuite - manual step
     echo "go to https://admin.google.com and authorize below client id"
@@ -117,6 +119,7 @@ destroy_resources() {
 # use gcloud projects list for listing projects
 echo "setting up project: $project_id for current session..."
 gcloud config set project "$project_id"
+gcloud config set compute/region "$region"
 
 create_resources
 #destroy_resources
