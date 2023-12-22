@@ -1,7 +1,8 @@
 # sumologic-gsuitealertcenter
 Solution to pull alerts from G Suite Alert Center to Sumo Logic
 
-Deprecation Notice
+# Deprecation Notice
+
 This legacy solution to pull logs from Alert Center to Sumo Logic has been replaced with a dedicated Cloud-to-Cloud Integration Framework source. We recommend customers use the Duo Cloud-to-Cloud source instead of this legacy Python collection method.
 [Google Workspace AlertCenter Source](https://help.sumologic.com/docs/send-data/hosted-collectors/cloud-to-cloud-integration-framework/google-workspace-alertcenter/)
 
